@@ -913,6 +913,10 @@ class ScopedEvalContextModifier(EvalContextModifier):
     fields = ('body',)
 
 
+class ScopedInclude(Stmt):
+    """Include with limited scope."""
+    fields = ('template', 'kwargs',)
+
 # make sure nobody creates custom nodes
 def _failing_new(*args, **kwargs):
     raise TypeError('can\'t create custom node types')

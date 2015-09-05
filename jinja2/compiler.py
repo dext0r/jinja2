@@ -1684,3 +1684,25 @@ class CodeGenerator(NodeVisitor):
             self.visit(child, frame)
         frame.eval_ctx.revert(safed_ctx)
         self.writeline('context.eval_ctx.revert(%s)' % old_ctx_name)
+
+    def visit_ScopedInclude(self, node, frame):
+        func_name = 'get_or_select_template'
+        if isinstance(node.template, nodes.Const):
+            if isinstance(node.template.value, string_types):
+                func_name = 'get_template'
+            elif isinstance(node.template.value, (tuple, list)):
+                func_name = 'select_template'
+        elif isinstance(node.template, (nodes.Tuple, nodes.List)):
+            func_name = 'select_template'
+
+        self.writeline('template = environment.%s(' % func_name, node)
+        self.visit(node.template, frame)
+        self.write(', %r)' % self.name)
+
+        self.writeline('for event in template.root_render_func('
+                       'template.new_context(context.parent, True, {"l_" + x: y for x, y in ')
+        self.visit(node.kwargs, frame)
+        self.writeline('.iteritems()})):')
+        self.indent()
+        self.simple_write('event', frame)
+        self.outdent()
