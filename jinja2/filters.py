@@ -18,7 +18,7 @@ from jinja2.utils import Markup, escape, pformat, urlize, soft_unicode, \
      unicode_urlencode
 from jinja2.runtime import Undefined
 from jinja2.exceptions import FilterArgumentError
-from jinja2._compat import imap, string_types, text_type, iteritems
+from jinja2._compat import imap, ifilter, string_types, text_type, iteritems
 
 
 _word_re = re.compile(r'\w+(?u)')
@@ -312,6 +312,9 @@ def do_join(eval_ctx, value, d=u'', attribute=None):
     """
     if attribute is not None:
         value = imap(make_attrgetter(eval_ctx.environment, attribute), value)
+
+    # reject None type values
+    value = ifilter(lambda x: x is not None, value)
 
     # no automatic escaping?  joining is a lot eaiser then
     if not eval_ctx.autoescape:
