@@ -915,7 +915,7 @@ class ScopedEvalContextModifier(EvalContextModifier):
 
 class ScopedInclude(Stmt):
     """Include with limited scope."""
-    fields = ('template', 'kwargs',)
+    fields = ('template', 'with_vars', 'kwargs',)
 
 # make sure nobody creates custom nodes
 def _failing_new(*args, **kwargs):

@@ -1699,10 +1699,14 @@ class CodeGenerator(NodeVisitor):
         self.visit(node.template, frame)
         self.write(', %r)' % self.name)
 
-        self.writeline('for event in template.root_render_func('
-                       'template.new_context(context.parent, True, {"l_" + x: y for x, y in ')
+        self.writeline('template_vars = {}')
+        if node.with_vars:
+            self.writeline('template_vars.update({"l_" + x: y for x, y in context.vars.iteritems()})')
+        self.writeline('template_vars.update({"l_" + x: y for x, y in ')
         self.visit(node.kwargs, frame)
-        self.writeline('.iteritems()})):')
+        self.write('.iteritems()})')
+        self.writeline('for event in template.root_render_func('
+                       'template.new_context(context.parent, True, template_vars)):')
         self.indent()
         self.simple_write('event', frame)
         self.outdent()
